@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Container, Typography, Button, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Pagination, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { Container, Typography, Button, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
 const API_URL = 'http://localhost:5000/contacts';
 
@@ -30,6 +30,18 @@ const App = () => {
 
     const handleFormSubmit = async () => {
         try {
+            // Validate for duplicates
+            const isDuplicate = contacts.some(
+                (contact) =>
+                    (contact.email === formData.email || contact.phone === formData.phone) &&
+                    contact.id !== formData.id
+            );
+
+            if (isDuplicate) {
+                alert("Duplicate contact found! Please check the email or phone number.");
+                return;
+            }
+
             if (editMode) {
                 await axios.put(`${API_URL}/${formData.id}`, formData);
             } else {
@@ -72,6 +84,7 @@ const App = () => {
                 <Table>
                     <TableHead>
                         <TableRow>
+                            <TableCell>ID</TableCell>
                             <TableCell>First Name</TableCell>
                             <TableCell>Last Name</TableCell>
                             <TableCell>Email</TableCell>
@@ -84,6 +97,7 @@ const App = () => {
                     <TableBody>
                         {contacts.map((contact) => (
                             <TableRow key={contact.id}>
+                                <TableCell>{contact.id}</TableCell>
                                 <TableCell>{contact.firstName}</TableCell>
                                 <TableCell>{contact.lastName}</TableCell>
                                 <TableCell>{contact.email}</TableCell>
